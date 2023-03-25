@@ -3,10 +3,13 @@ import { gql } from 'graphql-tag'
 export const typeDefs = gql`
  type Query {
     hello: String
+    projects: [Project]
+    tasks: [Task]
  }
 
 type Mutation {
    createProject(name: String, description: String):Project
+   createTask(title: String, projectId: ID): Task
 }
 
 type Project {
@@ -16,6 +19,14 @@ type Project {
    createdAt: String
    updateAt: String
 
+}
+
+type Task {
+   _id: ID
+   title: String
+   projectId: ID
+   createdAt: String
+   updateAt: String
 }
 
 `
