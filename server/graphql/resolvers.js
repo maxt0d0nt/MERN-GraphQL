@@ -5,7 +5,9 @@ export const resolvers = {
   Query: {
     hello: () => "hello max",
     projects: async () => await Project.find(),
+    project: async (_, {_id}) => await Project.findById(_id),
     tasks: async () => await Task.find(),
+    task: async (_, {_id}) => await Task.findById(_id),
   },
   Mutation: {
     createProject: async (_, { name, description }) => {
@@ -27,5 +29,15 @@ export const resolvers = {
     const taskSaved = await task.save();
     return taskSaved;
   },
+  deleteProject: async (_, { _id}) => {
+    const deletedProject = await Project.findByIdAndDelete(_id);
+    if (!deletedProject) throw new Error("Project not found");
+    return deletedProject;
+  },
+  deleteTask: async (_, { _id}) => {
+    const deletedTask = await Task.findByIdAndDelete(_id);
+    if (!deletedTask) throw new Error("Task not found");
+    return deletedTask;
+  }
   },
 };
