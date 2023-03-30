@@ -5,9 +5,9 @@ export const resolvers = {
   Query: {
     hello: () => "hello max",
     projects: async () => await Project.find(),
-    project: async (_, {_id}) => await Project.findById(_id),
+    project: async (_, { _id }) => await Project.findById(_id),
+    task: async (_, { _id }) => await Task.findById(_id),
     tasks: async () => await Task.find(),
-    task: async (_, {_id}) => await Task.findById(_id),
   },
   Mutation: {
     createProject: async (_, { name, description }) => {
@@ -19,25 +19,47 @@ export const resolvers = {
       return savedProject;
     },
     createTask: async (_, { title, projectId }) => {
-   const projectFound = await Project.findById(projectId);
-   if (!projectFound) throw new Error("project not found");
-   
-      const task = new Task ({
-      title,
-      projectId,
-    });
-    const taskSaved = await task.save();
-    return taskSaved;
+      const projectFound = await Project.findById(projectId);
+      if (!projectFound) throw new Error("project not found");
+
+      const task = new Task({
+        title,
+        projectId,
+      });
+      const taskSaved = await task.save();
+      return taskSaved;
+    },
+    deleteProject: async (_, { _id }) => {
+      const deletedProject = await Project.findByIdAndDelete(_id);
+      if (!deletedProject) throw new Error("Project not found");
+      await Task.deleteMany({ projectId: deletedProject._id });
+      return deletedProject;
+    },
+    deleteTask: async (_, { _id }) => {
+      const deletedTask = await Task.findByIdAndDelete(_id);
+      if (!deletedTask) throw new Error("Task not found");
+      return deletedTask;
+    },
+    updateProject: async (_, args) => {
+      const updatedProject = await Project.findByIdAndUpdate(args._id, args, {
+        new: true,
+      });
+      if (!updatedProject) throw new Error("Project not found");
+      return updatedProject;
+    },
+    updateTask: async (_, args) => {
+      const updatedTask = await Task.findByIdAndUpdate(args._id, args, {
+        new: true,
+      });
+      if (!updatedTask) throw new Error("Task not found");
+      return updatedTask;
+    },
   },
-  deleteProject: async (_, { _id}) => {
-    const deletedProject = await Project.findByIdAndDelete(_id);
-    if (!deletedProject) throw new Error("Project not found");
-    return deletedProject;
+
+  Project: {
+    tasks: async (parent) => await Task.find({ projectId: parent._id }),
   },
-  deleteTask: async (_, { _id}) => {
-    const deletedTask = await Task.findByIdAndDelete(_id);
-    if (!deletedTask) throw new Error("Task not found");
-    return deletedTask;
-  }
+  Task: {
+    project: async (parent) => await Project.findById(parent.projectId),
   },
 };
