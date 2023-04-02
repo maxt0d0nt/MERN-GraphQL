@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client';
 import React, { useState } from 'react'
+import { CREATE_PROJECT, GET_PROJECTS } from '../pages/graphql/projects';
 
 const ProjectForm = () => {
 
@@ -7,7 +8,14 @@ const [project, setProject] = useState({
   name:"",
   desription:"",
 });
-useMutation();
+const [createProject, { loading, error }] = useMutation(CREATE_PROJECT, {
+  refetchQueries: [
+    {
+      query: GET_PROJECTS,
+    },
+    "GetProjects",
+  ],
+});
 
 const handleChange = ({ target: { name, value } }) =>
 setProject({
@@ -17,15 +25,23 @@ setProject({
 
 const handleSubmit = (e) => {
   e.preventDefault();
-  console.log(project)
+  createProject({
+    variable: {
+      name: project.name,
+      desription: project.desription
+    }
+  })
 }
 
   return (
     <form onSubmit={handleSubmit}>
+      {error && <p>{error.message}</p>}
       <input type='text' name='name' placeholder='write a title' onChange={handleChange}
       />
       <textarea name='description' rows="3" placeholder='write a description' onChange={handleChange}></textarea>
-      <button>save</button>
+      <button
+      disabled={!project.name || !project.desription || loading}
+      >save</button>
     </form>
   )
 }
