@@ -15,6 +15,7 @@ export const resolvers = {
         name,
         description,
       });
+      
       const savedProject = await project.save();
       return savedProject;
     },
