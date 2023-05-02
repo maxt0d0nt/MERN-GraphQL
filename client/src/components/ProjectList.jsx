@@ -14,7 +14,7 @@ if (error) return <p>Error</p>
 
 
   return (
-    <div>
+    <div className='overflow-y-auto h-60 w-full px-5'>
         {data.projects.map((project) => (
             <ProjectCard key={project._id} project={project} />
         )
